@@ -23,6 +23,9 @@ namespace mauigridtest
             builder.Logging.AddDebug();
 #endif
 
+            builder.Services.AddSingleton<NounRepository>();
+            builder.Services.AddTransient<MainPage>();
+
             return builder.Build();
         }
     }

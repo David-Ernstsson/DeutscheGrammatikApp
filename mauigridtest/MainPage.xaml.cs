@@ -6,7 +6,9 @@ namespace mauigridtest
 {
     public partial class MainPage : ContentPage
     {
-        private int _currentNounIndex = 0;
+        private readonly NounRepository _nounRepository;
+
+        private Noun _currentNoun;
 
         private static TimeSpan DelayWhenCorrectAnswer = TimeSpan.FromMilliseconds(1500);
         private static TimeSpan DelayWhenWrongAnswer = TimeSpan.FromSeconds(3);
@@ -22,10 +24,13 @@ namespace mauigridtest
         private readonly Image _image;
         private readonly MediaElement _mediaElement;
 
-        public MainPage()
+        public MainPage(NounRepository nounRepository)
         {
+            _nounRepository = nounRepository;
+            _currentNoun = _nounRepository.GetNext();
+
             _image = new Image()
-                .Source(ImageSource.FromFile(Constants.Nouns[_currentNounIndex].ImageSource))
+                .Source(ImageSource.FromFile(_currentNoun.ImageSource))
                 .Row(Row.Image)
                 .Column(Column.Der, Column.Das);
 
@@ -33,7 +38,7 @@ namespace mauigridtest
             _image.VerticalOptions = LayoutOptions.Center;
 
             _nounTextLabel = new Label()
-                .Text(Constants.Nouns[_currentNounIndex].Text)
+                .Text(_currentNoun.Text)
                 .Row(Row.Text)
                 .Column(Column.Der, Column.Das);
 
@@ -104,19 +109,16 @@ namespace mauigridtest
 
         private void MoveToNextNoun()
         {
-            Random random = new();
-            var next = random.Next(Constants.Nouns.Count);
+            _currentNoun = _nounRepository.GetNext();
 
-            _currentNounIndex = next;
-
-            _nounTextLabel.Text = Constants.Nouns[_currentNounIndex].Text;
-            _image.Source = Constants.Nouns[_currentNounIndex].ImageSource;
-            _mediaElement.Source = MediaSource.FromResource(Constants.Nouns[_currentNounIndex].AudiResource);
+            _nounTextLabel.Text = _currentNoun.Text;
+            _image.Source = _currentNoun.ImageSource;
+            _mediaElement.Source = MediaSource.FromResource(_currentNoun.AudiResource);
         }
 
         async void CheckAnswer(string chosenGender)
         {
-            var correctGender = Constants.Nouns[_currentNounIndex].Gender;
+            var correctGender = _currentNoun.Gender;
             _mediaElement.Play();
 
             HighlightGender(correctGender, Colors.Green);
@@ -126,7 +128,7 @@ namespace mauigridtest
             }
 
             HideOtherButtons();
-            _nounTextLabel.Text = $"{correctGender} {Constants.Nouns[_currentNounIndex].Text}";
+            _nounTextLabel.Text = $"{correctGender} {_currentNoun.Text}";
 
             if (chosenGender != correctGender)
             {
