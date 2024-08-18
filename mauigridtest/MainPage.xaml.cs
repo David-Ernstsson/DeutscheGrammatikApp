@@ -15,7 +15,7 @@ namespace mauigridtest
 
         private readonly Label _nounTextLabel;
 
-        private enum Row { Image, Text, Audio, FileAudio, DownloadMedia,Gender }
+        private enum Row { Image, Text, Audio, Gender }
         private enum Column { Der, Die, Das }
 
         private readonly IList<Button> _buttons;
@@ -23,7 +23,8 @@ namespace mauigridtest
         private readonly Color _defaultButtonColor = Colors.Blue;
         private readonly Image _image;
         private readonly MediaElement _mediaElement;
-        private readonly MediaElement _fromFilemediaElement;
+
+        private const bool LocalResources = false;
 
         public MainPage(NounRepository nounRepository)
         {
@@ -31,7 +32,6 @@ namespace mauigridtest
             _currentNoun = _nounRepository.GetNext();
 
             _image = new Image()
-                .Source(ImageSource.FromFile(_currentNoun.ImageSource))
                 .Row(Row.Image)
                 .Column(Column.Der, Column.Das);
 
@@ -56,30 +56,12 @@ namespace mauigridtest
             _mediaElement.ShouldAutoPlay = false;
             _mediaElement.ShouldShowPlaybackControls = false;
 
-            _fromFilemediaElement = new MediaElement()
-                .Row(Row.FileAudio)
-                .Column(Column.Die);
-
-            _fromFilemediaElement.ShouldAutoPlay = false;
-            _fromFilemediaElement.ShouldShowPlaybackControls = true;
-
-            var downloadMediaButton = new Button()
-                .Text("Download")
-                .Row(Row.DownloadMedia)
-                .BackgroundColor(_defaultButtonColor)
-                .FontSize(50)
-                .Column(Column.Die);
-
-            downloadMediaButton.Command = new Command(DownloadMedia);
-
             Content = new Grid
             {
                 RowDefinitions = Rows.Define(
                     (Row.Image, Stars(3)),
                     (Row.Text, Stars(2)),
                     (Row.Audio, Stars(1)),
-                    (Row.FileAudio, Stars(1)),
-                    (Row.DownloadMedia, Stars(1)),
                     (Row.Gender, Stars(1))),
 
                 ColumnDefinitions = Columns.Define(
@@ -91,9 +73,7 @@ namespace mauigridtest
                 {
                     _image,
                     _mediaElement,
-                    _fromFilemediaElement,
                     _nounTextLabel,
-                    downloadMediaButton,
                     _buttons[0],
                     _buttons[1],
                     _buttons[2],
@@ -129,29 +109,20 @@ namespace mauigridtest
 
         private void MoveToNextNoun()
         {
-            var mainDir = FileSystem.Current.AppDataDirectory;
-
-
             _currentNoun = _nounRepository.GetNext();
 
             _nounTextLabel.Text = _currentNoun.Text;
-            _image.Source = ImageSource.FromFile($"{mainDir}\\{_currentNoun.ImageSource}");
-            var mediaElementSource = MediaSource.FromResource(_currentNoun.AudiResource);
 
-            _mediaElement.Source = mediaElementSource;
-
-            _fromFilemediaElement.Source = MediaSource.FromFile($"{mainDir}\\BigBuckBunny.mp4");
-        }
-
-        async void DownloadMedia()
-        {
-            // Create an output filename
-            using (var http = new HttpClient())
+            if (LocalResources)
             {
-                var stream = await http.GetStreamAsync("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
-                var path = Path.Combine(FileSystem.Current.AppDataDirectory, "BigBuckBunny.mp4");
-                await using Stream streamToWriteTo = File.Open(path, FileMode.Create);
-                await stream.CopyToAsync(streamToWriteTo);
+                _mediaElement.Source = MediaSource.FromResource(_currentNoun.AudioResource);
+                _image.Source = ImageSource.FromFile(_currentNoun.ImageSource);
+            }
+            else
+            {
+                var prefix = $"{FileSystem.Current.AppDataDirectory}\\";
+                _mediaElement.Source = MediaSource.FromFile($"{prefix}{_currentNoun.AudioResource}");
+                _image.Source = ImageSource.FromFile($"{prefix}{_currentNoun.ImageSource}");
             }
         }
 
