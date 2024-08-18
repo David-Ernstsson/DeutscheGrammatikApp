@@ -12,6 +12,7 @@ namespace mauigridtest
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkitMarkup()
+                .UseMauiCommunityToolkitMediaElement()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

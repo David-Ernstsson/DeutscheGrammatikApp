@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using CommunityToolkit.Maui.Views;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace mauigridtest
@@ -7,18 +8,19 @@ namespace mauigridtest
     {
         private int _currentNounIndex = 0;
 
-        private static TimeSpan DelayWhenCorrectAnswer = TimeSpan.FromMilliseconds(500);
+        private static TimeSpan DelayWhenCorrectAnswer = TimeSpan.FromMilliseconds(1500);
         private static TimeSpan DelayWhenWrongAnswer = TimeSpan.FromSeconds(3);
 
         private readonly Label _nounTextLabel;
 
-        private enum Row { Image, Text, Gender }
+        private enum Row { Image, Text, Audio, Gender }
         private enum Column { Der, Die, Das }
 
         private readonly IList<Button> _buttons;
 
         private readonly Color _defaultButtonColor = Colors.Blue;
         private readonly Image _image;
+        private readonly MediaElement _mediaElement;
 
         public MainPage()
         {
@@ -41,11 +43,20 @@ namespace mauigridtest
 
             _buttons = CreateGenderButtons();
 
+
+            _mediaElement = new MediaElement()
+                .Row(Row.Audio)
+                .Column(Column.Die);
+
+            _mediaElement.ShouldAutoPlay = false;
+            _mediaElement.ShouldShowPlaybackControls = false;
+
             Content = new Grid
             {
                 RowDefinitions = Rows.Define(
                     (Row.Image, Stars(3)),
                     (Row.Text, Stars(2)),
+                    (Row.Audio, Stars(1)),
                     (Row.Gender, Stars(1))),
 
                 ColumnDefinitions = Columns.Define(
@@ -56,13 +67,15 @@ namespace mauigridtest
                 Children =
                 {
                     _image,
-
+                    _mediaElement,
                     _nounTextLabel,
                     _buttons[0],
                     _buttons[1],
                     _buttons[2],
                 }
             };
+
+            MoveToNextNoun();
         }
 
         private IList<Button> CreateGenderButtons()
@@ -98,11 +111,13 @@ namespace mauigridtest
 
             _nounTextLabel.Text = Constants.Nouns[_currentNounIndex].Text;
             _image.Source = Constants.Nouns[_currentNounIndex].ImageSource;
+            _mediaElement.Source = MediaSource.FromResource(Constants.Nouns[_currentNounIndex].AudiResource);
         }
 
         async void CheckAnswer(string chosenGender)
         {
             var correctGender = Constants.Nouns[_currentNounIndex].Gender;
+            _mediaElement.Play();
 
             HighlightGender(correctGender, Colors.Green);
             if (chosenGender != correctGender)
@@ -121,6 +136,9 @@ namespace mauigridtest
             {
                 await Task.Delay(DelayWhenCorrectAnswer);
             }
+
+            _mediaElement.Stop();
+
             MoveToNextNoun();
             ResetButtons();
         }
