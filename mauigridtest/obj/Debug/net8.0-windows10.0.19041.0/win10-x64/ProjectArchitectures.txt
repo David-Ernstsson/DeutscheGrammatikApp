@@ -1,1 +1,0 @@
-C:\Users\david\source\repos\mauigridtest\mauigridtest\mauigridtest.csproj;x64
