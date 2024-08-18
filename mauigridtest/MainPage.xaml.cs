@@ -7,6 +7,9 @@ namespace mauigridtest
     {
         private int _currentNounIndex = 0;
 
+        private static TimeSpan DelayWhenCorrectAnswer = TimeSpan.FromMilliseconds(500);
+        private static TimeSpan DelayWhenWrongAnswer = TimeSpan.FromSeconds(3);
+
         private readonly Label _nounTextLabel;
 
         private enum Row { Image, Text, Gender }
@@ -25,11 +28,15 @@ namespace mauigridtest
                 .Column(Column.Der, Column.Das);
 
             _image.HorizontalOptions = LayoutOptions.Center;
+            _image.VerticalOptions = LayoutOptions.Center;
 
             _nounTextLabel = new Label()
                 .Text(Constants.Nouns[_currentNounIndex].Text)
                 .Row(Row.Text)
                 .Column(Column.Der, Column.Das);
+
+            _nounTextLabel.FontSize(100);
+
             _nounTextLabel.HorizontalOptions = LayoutOptions.Center;
 
             _buttons = CreateGenderButtons();
@@ -74,6 +81,7 @@ namespace mauigridtest
                 .Text(gender)
                 .Row(Row.Gender)
                 .BackgroundColor(_defaultButtonColor)
+                .FontSize(50)
                 .Column(column);
 
             button.Command = new Command(() => CheckAnswer(gender));
@@ -105,7 +113,14 @@ namespace mauigridtest
             HideOtherButtons();
             _nounTextLabel.Text = $"{correctGender} {Constants.Nouns[_currentNounIndex].Text}";
 
-            await Task.Delay(1000);
+            if (chosenGender != correctGender)
+            {
+                await Task.Delay(DelayWhenWrongAnswer);
+            }
+            else
+            {
+                await Task.Delay(DelayWhenCorrectAnswer);
+            }
             MoveToNextNoun();
             ResetButtons();
         }
