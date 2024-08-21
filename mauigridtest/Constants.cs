@@ -1,4 +1,6 @@
-﻿namespace mauigridtest;
+﻿using mauigridtest.Models;
+
+namespace mauigridtest;
 
 public static class Constants
 {

@@ -1,7 +1,11 @@
-﻿namespace mauigridtest;
+﻿using SQLite;
+
+namespace mauigridtest.Models;
 
 public class Noun
 {
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
     public string Text { get; set; }
     public string ImageSource { get; set; }
     public string AudioResource { get; set; }

@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
+using mauigridtest.Data;
+using mauigridtest.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace mauigridtest
@@ -11,6 +13,7 @@ namespace mauigridtest
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .UseMauiCommunityToolkitMarkup()
                 .UseMauiCommunityToolkitMediaElement()
                 .ConfigureFonts(fonts =>
@@ -24,7 +27,9 @@ namespace mauigridtest
 #endif
 
             builder.Services.AddSingleton<NounRepository>();
+            builder.Services.AddSingleton<DatabaseContext>();
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<NounViewModel>();
 
             return builder.Build();
         }
