@@ -5,9 +5,7 @@ namespace mauigridtest.Data;
 
 public class DatabaseContext : IAsyncDisposable
 {
-    //private const string DbName = "MyDatabase.db3";
     private const string DbName = "german_grammar_game.db";
-    //private static string DbPath => "german_grammar_game2.db";
     private static string DbPath => Path.Combine(FileSystem.AppDataDirectory, DbName);
 
     private SQLiteAsyncConnection? _connection;

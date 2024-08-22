@@ -80,6 +80,23 @@ public partial class NounViewModel : ObservableObject
             await _dataInitService.Init();
         }
 
+        var databaseName = "german_grammar_game.db";
+        var dbPath = Path.Combine(FileSystem.AppDataDirectory, databaseName);
+
+        var shouldCopyDbToAppDirectory = !File.Exists(dbPath);
+        if (shouldCopyDbToAppDirectory)
+        {
+            var databasePath = System.IO.Path.Combine(FileSystem.AppDataDirectory, databaseName);
+
+            var stream = await FileSystem.OpenAppPackageFileAsync(databaseName);
+
+            using MemoryStream memoryStream = new MemoryStream();
+
+            await stream.CopyToAsync(memoryStream);
+
+            await File.WriteAllBytesAsync(databasePath, memoryStream.ToArray());
+        }
+
         await MoveToNextNoun();
     }
 
