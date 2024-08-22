@@ -16,7 +16,7 @@ namespace mauigridtest
 
         public MainPage(NounViewModel viewModel)
         {
-            viewModel.CurrentNoun = new Noun { Text = "Loading", ImageSource = "cat.png" };
+            viewModel.CurrentNoun = new GameNoun { Singular = "Loading" };
 
             _nounViewModel = viewModel;
             BindingContext = viewModel;
@@ -24,11 +24,11 @@ namespace mauigridtest
             var image = new Image()
                 .Row(Row.Image)
                 .Column(Column.Der, Column.Das)
-                .Bind(Image.SourceProperty, static (NounViewModel vm) => vm.CurrentNoun.ImageSource,
+                .Bind(Image.SourceProperty, static (NounViewModel vm) => vm.CurrentNoun.ImagePath,
                     handlers:
                     [
                         (vm => vm, nameof(NounViewModel.CurrentNoun)),
-                        (vm => vm.CurrentNoun, nameof(NounViewModel.CurrentNoun.ImageSource))
+                        (vm => vm.CurrentNoun, nameof(NounViewModel.CurrentNoun.ImagePath))
                     ]);
 
             image.HorizontalOptions = LayoutOptions.Center;
@@ -38,11 +38,11 @@ namespace mauigridtest
                 .Row(Row.Text)
                 .Column(Column.Der, Column.Das)
                 //.Bind(Label.TextProperty, nameof(viewModel.SomeText));
-                .Bind(Label.TextProperty, static (NounViewModel vm) => vm.CurrentNoun.Text,
+                .Bind(Label.TextProperty, static (NounViewModel vm) => vm.CurrentNoun.Singular,
                     handlers:
                     [
                         (vm => vm, nameof(NounViewModel.CurrentNoun)),
-                        (vm => vm.CurrentNoun, nameof(NounViewModel.CurrentNoun.Text))
+                        (vm => vm.CurrentNoun, nameof(NounViewModel.CurrentNoun.Singular))
                     ]);
             //.Bind(Label.TextProperty, static (NounViewModel vm) => vm.CurrentNoun.Text);
 

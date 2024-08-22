@@ -1,14 +1,18 @@
-﻿using SQLite;
+﻿using mauigridtest.Models;
+using SQLite;
 
 namespace mauigridtest.Data;
 
 public class DatabaseContext : IAsyncDisposable
 {
-    private const string DbName = "MyDatabase.db3";
+    //private const string DbName = "MyDatabase.db3";
+    private const string DbName = "german_grammar_game.db";
+    //private static string DbPath => "german_grammar_game2.db";
     private static string DbPath => Path.Combine(FileSystem.AppDataDirectory, DbName);
 
-    private SQLiteAsyncConnection _connection;
-    private SQLiteAsyncConnection Database =>
+    private SQLiteAsyncConnection? _connection;
+
+    public SQLiteAsyncConnection Database =>
         (_connection ??= new SQLiteAsyncConnection(DbPath,
             SQLiteOpenFlags.Create | SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache));
 
@@ -35,6 +39,10 @@ public class DatabaseContext : IAsyncDisposable
 
     private async Task CreateTableIfNotExists<TTable>() where TTable : class, new()
     {
+        if (Database is not null)
+        {
+            return;
+        }
         await Database.CreateTableAsync<TTable>();
     }
 

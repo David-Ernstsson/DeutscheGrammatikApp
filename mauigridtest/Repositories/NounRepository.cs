@@ -12,28 +12,18 @@ public class NounRepository
         _databaseContext = databaseContext;
     }
 
-    public async Task<List<Noun>> GetAll()
+    public async Task<List<GameNoun>> GetAll()
     {
-        var nouns = await _databaseContext.GetAllAsync<Noun>();
-        if (nouns.Count() == 0)
-        {
-
-            foreach (var noun in Constants.Nouns)
-            {
-                await _databaseContext.AddItemAsync<Noun>(noun);
-            }
-
-            return await GetAll();
-        }
-
-
+        var nouns = await _databaseContext.GetAllAsync<GameNoun>();
         return nouns.ToList();
     }
 
-    public async Task<Noun> GetNext()
+    public async Task<GameNoun> GetNext()
     {
+        var count = (await GetAll()).Count;
+
         Random random = new();
-        var next = random.Next(Constants.Nouns.Count);
+        var next = random.Next(count - 1);
 
         return (await GetAll())[next];
     }

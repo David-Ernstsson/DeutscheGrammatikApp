@@ -1,27 +1,31 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Diagnostics;
 using mauigridtest.Models;
-using System.Runtime.CompilerServices;
 using mauigridtest.Repositories;
+using mauigridtest.Data;
+using Microsoft.Extensions.Logging;
 
 namespace mauigridtest;
 
 public partial class NounViewModel : ObservableObject
 {
     private readonly NounRepository _nounRepository;
+    private readonly ILogger<NounViewModel> _logger;
+    private readonly DataInitService _dataInitService;
     private readonly Color _defaultButtonColor = Colors.LightBlue;
 
     private static TimeSpan DelayWhenCorrectAnswer = TimeSpan.FromMilliseconds(1500);
     private static TimeSpan DelayWhenWrongAnswer = TimeSpan.FromSeconds(3);
 
     [ObservableProperty]
-    private Noun currentNoun;
+    private GameNoun currentNoun;
 
-    public NounViewModel(NounRepository nounRepository)
+    public NounViewModel(NounRepository nounRepository, ILogger<NounViewModel> logger, DataInitService dataInitService)
     {
         _nounRepository = nounRepository;
+        _logger = logger;
+        _dataInitService = dataInitService;
 
-        Task.Run(async () => await MoveToNextNoun().ConfigureAwait(false));
+        Task.Run(async () => await Init().ConfigureAwait(false));
     }
 
     public IList<Button> Buttons { get; set; } = new List<Button>();
@@ -66,6 +70,17 @@ public partial class NounViewModel : ObservableObject
 
         await MoveToNextNoun();
         ResetButtons();
+    }
+
+    private async Task Init()
+    {
+        var shouldInit = false;
+        if (shouldInit)
+        {
+            await _dataInitService.Init();
+        }
+
+        await MoveToNextNoun();
     }
 
     private async Task MoveToNextNoun()

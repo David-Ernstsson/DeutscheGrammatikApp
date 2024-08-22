@@ -30,6 +30,7 @@ namespace mauigridtest
             builder.Services.AddSingleton<DatabaseContext>();
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<NounViewModel>();
+            builder.Services.AddTransient<DataInitService>();
 
             return builder.Build();
         }
